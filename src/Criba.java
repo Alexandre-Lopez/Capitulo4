@@ -15,7 +15,7 @@ public class Criba {
 
         boolean[] esPrimo = new boolean[max + 1];
         inicializarEsPrimo(esPrimo); // Inicializa el vector de booleanos que representa los números primos
-        aplicarCribaDeEratostenes(esPrimo, max + 1); // Realiza la criba de Eratóstenes
+        aplicarCriba(esPrimo, max + 1); // Realiza la criba de Eratóstenes
         return encontrarNumerosPrimos(esPrimo); // Devuelve un vector con los números primos
     }
 
@@ -27,7 +27,13 @@ public class Criba {
         esPrimo[1] = false;
     }
 
-    private static void aplicarCribaDeEratostenes(boolean[] esPrimo, int dim) {
+    /* En este método se ha modificado la condición del primer bucle for, sustituyendo "Math.sqrt(dim) + 1"
+    por "i * i < dim". Esta modificación se realiza para mejorar el rendimiento del programa,
+    ya que calcular la raíz cuadrada de un número es más costoso computacionalmente que multiplicar un número por sí mismo.
+    También se ha modificado el segundo bucle for, cambiando el valor inicial de j en el bucle interno para comenzar
+    en "i * i" en lugar de "2 * i", lo que nos permite evitar duplicar el trabajo al eliminar los múltiplos de números
+    menores a "i"*/
+    private static void aplicarCriba(boolean[] esPrimo, int dim) {
         for (int i = 2; i * i < dim; i++) {
             if (esPrimo[i]) {
                 for (int j = i * i; j < dim; j += i) {
@@ -57,12 +63,17 @@ public class Criba {
 
     private static int solicitarNumeroMaximo() {
         Scanner teclado = new Scanner(System.in);
-        System.out.println("Introduce el número máximo para la criba de Eratóstenes:");
+        System.out.println("Introduce el número para la criba de Erastótenes:");
         return teclado.nextInt();
     }
 
+    /* Se ha utilizado un StringBuilder en los métodos de "imprimirVectorInicial" y "imprimirVectorPrimos" en lugar de
+    la concatenación de cadenas porque el proceso de concatenación de cadenas es ineficiente y puede afectar
+    negativamente el rendimiento, ya que crea objetos String nuevos en memoria cada vez que se concatenan dos cadenas.
+    En cambio, el StringBuilder crea un objeto mutable que permite la adición de cadenas sin crear un nuevo objeto cada
+    vez, lo que mejora el rendimiento y la eficiencia de la aplicación. */
     private static void imprimirVectorInicial(int max) {
-        StringBuilder vectorInicial = new StringBuilder("\nVector inicial de números hasta: " + max + "\n");
+        StringBuilder vectorInicial = new StringBuilder("\nVector inicial hasta: " + max + "\n");
         for (int i = 1; i <= max; i++) {
             vectorInicial.append(i).append("\t");
             if (i % 10 == 0) {
@@ -73,7 +84,7 @@ public class Criba {
     }
 
     private static void imprimirVectorPrimos(int max, int[] primos) {
-        StringBuilder vectorPrimos = new StringBuilder("\nVector de números primos hasta: " + max + "\n");
+        StringBuilder vectorPrimos = new StringBuilder("\nVector de primos hasta: " + max + "\n");
         for (int i = 0; i < primos.length; i++) {
             vectorPrimos.append(primos[i]).append("\t");
             if ((i + 1) % 10 == 0) {
