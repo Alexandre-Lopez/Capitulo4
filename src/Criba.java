@@ -9,61 +9,49 @@ import java.util.Scanner;
  */
 public class Criba {
     /**
-     * Método main de la clase Criba
+     * Genera un vector de números primos hasta el número máximo especificado.
      *
-     * @param args
+     * @param max el número máximo hasta el que se quieren generar los primos
+     * @return un vector con los números primos hasta el número máximo
      */
-    public static void main(String[] args) {
-        int max = solicitarNumeroMaximo();
-        imprimirVectorInicial(max);
-        int[] primos = generarVectorPrimos(max);
-        imprimirVectorPrimos(max, primos);
-    }
-
-    /**
-     * Método que genera un vector con todos los números primos desde 2 hasta el número máximo especificado.
-     * Si el número máximo es menor que 2, el método devuelve un vector vacío.
-     *
-     * @param max El número máximo hasta el cual se generan los números primos
-     * @return Un vector de enteros que contiene todos los números primos entre 2 y el número máximo (inclusive),
-     * o un vector vacío si el número máximo es menor que 2.
-     */
-    public static int[] generarVectorPrimos(int max) {
+    public static int[] generarPrimos(int max) {
         if (max < 2) {
-            return new int[0];
+            return new int[0]; // Vector vacío
         }
 
-        boolean[] esPrimo = new boolean[max + 1];
-        inicializarEsPrimo(esPrimo);
-        aplicarCriba(esPrimo, max + 1);
-        return encontrarNumerosPrimos(esPrimo);
+        boolean[] esPrimo = inicializarArrayPrimos(max);
+        cribarMultiplosDePrimos(esPrimo);
+        int[] primos = obtenerNumerosPrimos(esPrimo);
+
+        return primos;
     }
 
     /**
-     * Método que inicializa el vector de primos "esPrimo" con el valor "true" para las posiciones mayores a 1,
-     * y con el valor "false" para las posiciones 0 y 1
+     * Inicializa un array de booleanos indicando que todos los números hasta el máximo son primos.
      *
-     * @param esPrimo Vector de booleanos que indica si cada número hasta una dimensión dada es primo o no
+     * @param max el número máximo hasta el que se quieren generar los primos
+     * @return un array de booleanos con valor "true" en las posiciones que corresponden a números primos
      */
-    public static void inicializarEsPrimo(boolean[] esPrimo) {
-        for (int i = 2; i < esPrimo.length; i++) {
+    private static boolean[] inicializarArrayPrimos(int max) {
+        int dim = max + 1;
+        boolean[] esPrimo = new boolean[dim];
+        for (int i = 0; i < dim; i++) {
             esPrimo[i] = true;
         }
-        esPrimo[0] = false;
-        esPrimo[1] = false;
+        esPrimo[0] = esPrimo[1] = false;
+        return esPrimo;
     }
 
     /**
-     * Método que implementa el algoritmo de la criba de Eratóstenes para identificar qué números hasta un valor máximo
-     * proporcionado por el usuario son primos y cuáles no lo son
+     * Marca como no primos todos los múltiplos de los números primos encontrados.
      *
-     * @param esPrimo Vector de booleanos que indica si cada número hasta una dimensión dada es primo o no
-     * @param dim Tamaño del vector
+     * @param esPrimo un array de booleanos con valor "true" en las posiciones que corresponden a números primos
      */
-    public static void aplicarCriba(boolean[] esPrimo, int dim) {
-        for (int i = 2; i * i < dim; i++) {
+    private static void cribarMultiplosDePrimos(boolean[] esPrimo) {
+        int dim = esPrimo.length;
+        for (int i = 2; i < Math.sqrt(dim) + 1; i++) {
             if (esPrimo[i]) {
-                for (int j = i * i; j < dim; j += i) {
+                for (int j = 2 * i; j < dim; j += i) {
                     esPrimo[j] = false;
                 }
             }
@@ -71,70 +59,61 @@ public class Criba {
     }
 
     /**
-     * Método que devuelve un vector que contiene todos los números primos encontrados en el vector de booleanos que se le pasa como parámetro
+     * Obtiene los números primos a partir del array de booleanos que indica qué números son primos.
      *
-     * @param esPrimo Vector de booleanos que indica si cada número hasta una dimensión dada es primo o no
-     * @return Vector de enteros que contiene todos los números primos encontrados en el vector de booleanos
+     * @param esPrimo un array de booleanos con valor "true" en las posiciones que corresponden a números primos
+     * @return un array con los números primos encontrados
      */
-    public static int[] encontrarNumerosPrimos(boolean[] esPrimo) {
+    private static int[] obtenerNumerosPrimos(boolean[] esPrimo) {
         int cuenta = 0;
-        for (boolean esPrimoActual : esPrimo) {
-            if (esPrimoActual) {
+        int dim = esPrimo.length;
+        for (int i = 0; i < dim; i++) {
+            if (esPrimo[i]) {
                 cuenta++;
             }
         }
-
         int[] primos = new int[cuenta];
-        for (int i = 0, j = 0; i < esPrimo.length; i++) {
+        for (int i = 0, j = 0; i < dim; i++) {
             if (esPrimo[i]) {
                 primos[j++] = i;
             }
         }
-
         return primos;
     }
 
     /**
-     * Método que solicita al usuario un número máximo para aplicar la criba de Erastótenes
+     * Imprime un vector de enteros junto con un título en la consola.
      *
-     * @return El número máximo ingresado por el usuario
+     * @param vector El vector de enteros a imprimir.
+     * @param titulo El título que se mostrará junto al vector en la consola.
      */
-    public static int solicitarNumeroMaximo() {
+    public static void imprimirVector(int[] vector, String titulo) {
+        System.out.println("\n" + titulo + ":");
+        for (int i = 0; i < vector.length; i++) {
+            if (i % 10 == 0) System.out.println();
+            System.out.print(vector[i] + "\t");
+        }
+        System.out.println();
+    }
+
+    /**
+     * Método main de la clase Criba
+     *
+     * @param args
+     */
+    public static void main(String[] args) {
         Scanner teclado = new Scanner(System.in);
         System.out.println("Introduce el número para la criba de Erastótenes:");
-        return teclado.nextInt();
-    }
+        int dato = teclado.nextInt();
+        int vector[] = new int[dato];
 
-    /**
-     * Método que imprime el vector inicial hasta el número máximo especificado.
-     *
-     * @param max Número que el usuario ha introducido por teclado
-     */
-    public static void imprimirVectorInicial(int max) {
-        StringBuilder vectorInicial = new StringBuilder("\nVector inicial hasta: " + max + "\n");
-        for (int i = 1; i <= max; i++) {
-            vectorInicial.append(i).append("\t");
-            if (i % 10 == 0) {
-                vectorInicial.append("\n");
-            }
+        for (int i = 0; i < vector.length; i++) {
+            vector[i] = i + 1;
         }
-        System.out.println(vectorInicial);
-    }
 
-    /**
-     * Método que imprime el vector de números primos hasta el número máximo especificado.
-     *
-     * @param max Número que el usuario ha introducido por teclado
-     * @param primos Vector de enteros que contiene todos los números primos encontrados en el vector de booleanos esPrimo
-     */
-    public static void imprimirVectorPrimos(int max, int[] primos) {
-        StringBuilder vectorPrimos = new StringBuilder("\nVector de primos hasta: " + max + "\n");
-        for (int i = 0; i < primos.length; i++) {
-            vectorPrimos.append(primos[i]).append("\t");
-            if ((i + 1) % 10 == 0) {
-                vectorPrimos.append("\n");
-            }
-        }
-        System.out.println(vectorPrimos);
+        int[] primos = generarPrimos(dato);
+
+        imprimirVector(vector, "Vector inicial hasta " + dato);
+        imprimirVector(primos, "Vector de primos hasta " + dato);
     }
 }
